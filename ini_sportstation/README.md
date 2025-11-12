@@ -146,7 +146,7 @@ Widget `MaterialApp` menjadi widget root karena hampir semua aplikasi Flutter me
 ### Jelaskan perbedaan antara StatelessWidget dan StatefulWidget. Kapan kamu memilih salah satunya?
 `StatelessWidget` adalah widget yang tidak memiliki state (keadaan) yang berubah setelah dibuat sehingga ketika sudah di-build, tampilannya akan selalu sama (statis). Sedangkan, `StatefulWidget` adalah widget yang memiliki state (keadaan) yang dapat berubah selama aplikasi berjalan, dan ketika state berubah, UI akan di-rebuild secara otomatis.
 
-Perbedaan yang mendasar dari keduanya adalah sebagai berikut:
+Perbedaan yang mendasar dari keduanya adalah sebagai berikut:<br>
 `StatelessWidget`
 - Bersifat statis
 - Data diterima lewat constructor
@@ -182,3 +182,173 @@ Cara kerja hot reload:
 4. State (nilai variabel di `StatefulWidget`) tetap dipertahankan
 
 Sedangkan, hot restart memulai ulang aplikasi dari awal, tanpa rebuild penuh seperti menjalankan `flutter run`, tetapi **menghapus semua state** yang tersimpan di memori. Jadi perbedaan dasarnya dengan hot reload adalah hot reload menyimpan state, hot restart tidak.
+
+## Tugas 8
+### Jelaskan perbedaan antara `Navigator.push()` dan `Navigator.pushReplacement()` pada Flutter. Dalam kasus apa sebaiknya masing-masing digunakan pada aplikasi Football Shop kamu?
+`Navigator.push()` **menambahkan halaman baru di atas halaman sebelumnya** di dalam stack navigasi. Karena halaman tetap ada di bawah halaman baru, maka user bisa kembali ke halaman lama menggunakan tombol back. Sedangkan, `Navigator.pushReplacement()` **mengganti halaman saat ini dengan halaman baru**. Karena halaman lama diganti dengan halaman baru, maka user tidak bisa kembali ke halaman lama.
+
+Pada Football Shop saya (Ini Sporstation), sebaiknya `Navigator.push()` digunakan ketika user menekan tombol yang memang bisa dilakukan Back. Contohnya adalah ketika user klik tombol "Tambah Produk", maka yang digunakan adalah `Navigator.push() agar saat user tidak jadi menambahkan produk, user dapat klik tombol Back untuk kembali ke halaman sebelumnya.
+
+Adapun `Navigator.pushReplacement()` sebaiknya digunakan ketika user sebaiknya tidak bisa melakukan tombol Back. Contohnya adalah ketika user selesai mengisi form produk dan menekan save, maka yang digunakan adalah `Navigator.pushReplacement()` agar user tidak bisa kembali ke form produk yang tadi diisi.
+
+### Bagaimana kamu memanfaatkan hierarchy widget seperti `Scaffold`, `AppBar`, dan `Drawer` untuk membangun struktur halaman yang konsisten di seluruh aplikasi?
+`Scaffold` berfungsi sebagai kerangka utama (layout skeleton) untuk setiap halaman dan mengatur posisi `Drawer`, `AppBar`, dan lainnya. `AppBar` adalah bagian atas halaman yang biasanya berisi judul halaman, tombol navigasi, dan aksi-aksi tambahan lainnya (seperti search dan setting). `Drawer` adalah menu navigasi samping (muncul saat user klik ikon menu berupa tiga garis horizontal) yang biasa berisi `ListTile` untuk pindah halaman.
+
+Pada Football Shop saya (Ini Sportstation), setiap halaman dibangung menggunakan `Scaffold` sebagai kerangka utama. Masing-masing halaman memiliki `AppBar`-nya sendiri tergantung dengan apa yang dapat user lakukan di halaman tersebut. Jika `AppBar` ingin dibuat seragam, maka kita bisa memubat suatu widget yang berisi `AppBar` (misalkan `buildAppBar()`) dan memanggil `buildAppBar()` pada setiap `AppBar` yang ingin kita buat. Jika `Drawer` ingin dibuat seragam, kita bisa membuat suatu widget yang berisi `Drawer` (misalkan `AppDrawer()`) dan memanggil `Drawer` tersebut di setiap halaman yang membutuhkan `Drawer`.
+
+Contohnya adalah pada `app_drawer.dart` yang berisi:
+```dart
+import 'package:flutter/material.dart';
+import 'package:ini_sportstation/menu.dart';
+import 'package:ini_sportstation/create_product_page.dart';
+
+class AppDrawer extends StatelessWidget {
+  const AppDrawer({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Drawer(
+      child: ListView(
+        padding: EdgeInsets.zero,
+        children: [
+          const DrawerHeader(
+            decoration: BoxDecoration(color: Colors.blue),
+            child: Text(
+              'Ini Sportstation',
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ),
+
+          // Halaman Utama
+          ListTile(
+            leading: const Icon(Icons.home),
+            title: const Text('Halaman Utama'),
+            onTap: () {
+              Navigator.pop(context);
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(builder: (context) => MyHomePage()),
+              );
+            },
+          ),
+
+          // Tambah Produk
+          ListTile(
+            leading: const Icon(Icons.add_box),
+            title: const Text('Tambah Produk'),
+            onTap: () {
+              Navigator.pop(context);
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const CreateProductPage(),
+                ),
+              );
+            },
+          ),
+        ],
+      ),
+    );
+  }
+}
+```
+
+pada halaman utama `menu.dart` kita hanya perlu memanggil drawer tersebut dengan
+
+```dart
+...
+drawer: const AppDrawer(),
+...
+```
+
+untuk menggunakan widget `Drawer` yang sudah dibuat.
+
+### Dalam konteks desain antarmuka, apa kelebihan menggunakan layout widget seperti `Padding`, `SingleChildScrollView`, dan `ListView` saat menampilkan elemen-elemen form? Berikan contoh penggunaannya dari aplikasi kamu.
+1. `Padding`
+- Fungsi: Memberi jarak antar elemen agar tampilan tidak terlalu rapat dan nyaman dilihat
+- Kelebihan:
+  - Meningkatkan readability
+  - Memberi ruang visual antar elemen form
+  - Membantu menjaga konsisten layout di seluruh halaman
+- Contoh pada aplikasi:
+```dart
+            const Padding(
+              padding: EdgeInsets.only(top: 16.0),
+              child: Text(
+                'Selamat datang di Ini Sportstation',
+                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18.0),
+              ),
+            )
+```
+`Padding` tersebut bertujuan agar teks "Selamat datang di Ini Sportstation" tersebut berjarak dengan elemen lainnya
+
+2. `SingleScrollChildView`
+- Fungsi: Membuat halaman dapat di-scroll saat konten melebihi tinggi layar (overflow)
+- Kelebihan:
+  - Mencegah overflow pada halaman yang panjang
+  - Responsif di semua perangkat, baik mobile maupun tablet
+  - Memastikan user bisa mengakses seluruh field
+- Contoh pada aplikasi:
+```dart
+SingleChildScrollView(
+            child: ListBody(
+              children: [
+                Text('Nama: ${_nameController.text}'),
+                Text('Harga: ${_priceController.text}'),
+                Text('Deskripsi: ${_descriptionController.text}'),
+                Text('Thumbnail URL: ${_thumbnailController.text}'),
+                Text('Kategori: $_selectedCategory'),
+                Text('Featured: ${_isFeatured ? "Ya" : "Tidak"}'),
+              ],
+            ),
+          )
+```
+`SingleChildScrollView` tersebut berguna agar user bisa scroll ke bawah apabila form melebihi tinggi layar (overflow)
+
+3. `ListView`
+- Fungsi: Mirip `Column`, tetapi bisa di-scroll dan lebih efisien untuk banyak elemen dinamis
+- Kelebihan:
+  - Tidak perlu dibungkus `SingleChildScrollView`
+  - Lebih efisien untuk daftar panjang sepert daftar produk
+  - Mendukung lazy loading (hanya render elemen yang tampak di layar)
+- Contoh penggunaan pada aplikasi (belum ada untuk saat ini karena tidak ada produk):
+```dart
+body: ListView.builder(
+  padding: const EdgeInsets.all(16.0),
+  itemCount: products.length,
+  itemBuilder: (context, index) {
+    final product = products[index];
+    return Card(
+      child: ListTile(
+        title: Text(product.name),
+        subtitle: Text('Rp ${product.price}'),
+      ),
+    );
+  },
+)
+```
+`ListView` tersebut berguna untuk menampilkan daftar produk yang berisi nama dan harga produk tersebut
+
+### Bagaimana kamu menyesuaikan warna tema agar aplikasi Football Shop memiliki identitas visual yang konsisten dengan brand toko?
+1. Menentukan palette warna brand
+Primary color dari Football Shop Ini Sportstation versi Web menggunakan warna hijau rumput, maka primary color dari Ini Sportstation versi Mobile juga berwarna hijau rumput agar memberikan kesan lapangan hijau. Adapaun secondary color yang digunakan adalah warna hitam dan accent color adalah abu-abu sesuai dengan Ini Sportstation versi Web
+
+2. Mengatur warna global di `ThemeData` dengan mengubah bagian ini di `main.dart`:
+```dart
+      theme: ThemeData(
+        colorScheme: ColorScheme.fromSwatch(
+          primarySwatch: Colors.blue,
+        ).copyWith(secondary: Colors.blueAccent[400]),
+      )
+```
+bagian `ColorScheme.fromSwatch()` dapat diubah menjadi `ColorScheme.fromSeed()` agar bisa menentukan `seedColor` (warna dasar brand), `primary` (warna utama), `secondary` (warna sekunder), dan lainnya.
+
+3. Menggunakan warna dari `Theme` pada widget seperti:
+```dart
+color: Theme.of(context).colorScheme.primary
+```
+Hal ini bertujuan agar setiap widget dapat menyesuaikan dengan tema warna global.
