@@ -187,7 +187,7 @@ Sedangkan, hot restart memulai ulang aplikasi dari awal, tanpa rebuild penuh sep
 ### Jelaskan perbedaan antara `Navigator.push()` dan `Navigator.pushReplacement()` pada Flutter. Dalam kasus apa sebaiknya masing-masing digunakan pada aplikasi Football Shop kamu?
 `Navigator.push()` **menambahkan halaman baru di atas halaman sebelumnya** di dalam stack navigasi. Karena halaman tetap ada di bawah halaman baru, maka user bisa kembali ke halaman lama menggunakan tombol back. Sedangkan, `Navigator.pushReplacement()` **mengganti halaman saat ini dengan halaman baru**. Karena halaman lama diganti dengan halaman baru, maka user tidak bisa kembali ke halaman lama.
 
-Pada Football Shop saya (Ini Sporstation), sebaiknya `Navigator.push()` digunakan ketika user menekan tombol yang memang bisa dilakukan Back. Contohnya adalah ketika user klik tombol "Tambah Produk", maka yang digunakan adalah `Navigator.push() agar saat user tidak jadi menambahkan produk, user dapat klik tombol Back untuk kembali ke halaman sebelumnya.
+Pada Football Shop saya (Ini Sporstation), sebaiknya `Navigator.push()` digunakan ketika user menekan tombol yang memang bisa dilakukan Back. Contohnya adalah ketika user klik tombol "Tambah Produk", maka yang digunakan adalah `Navigator.push()` agar saat user tidak jadi menambahkan produk, user dapat klik tombol Back untuk kembali ke halaman sebelumnya.
 
 Adapun `Navigator.pushReplacement()` sebaiknya digunakan ketika user sebaiknya tidak bisa melakukan tombol Back. Contohnya adalah ketika user selesai mengisi form produk dan menekan save, maka yang digunakan adalah `Navigator.pushReplacement()` agar user tidak bisa kembali ke form produk yang tadi diisi.
 
@@ -286,7 +286,7 @@ untuk menggunakan widget `Drawer` yang sudah dibuat.
 ```
 `Padding` tersebut bertujuan agar teks "Selamat datang di Ini Sportstation" tersebut berjarak dengan elemen lainnya
 
-2. `SingleScrollChildView`
+2. `SingleChildScrollView`
 - Fungsi: Membuat halaman dapat di-scroll saat konten melebihi tinggi layar (overflow)
 - Kelebihan:
   - Mencegah overflow pada halaman yang panjang
