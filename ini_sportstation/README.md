@@ -141,7 +141,7 @@ Fungsi widget `MaterialApp`:
 4. Menyediakan struktur Material Design global seperti `Scaffold`, `AppBar`, dan lainnya
 5. Mengatur konfigurasi aplikasi seperti `title`, locale (untuk bahasa), debug, dan lainnnya
 
-Widget `MaterialApp` menjadi widget root karena hampir semua aplikasi Flutter menggunakan design dan komponen Material Design, membutuhkan tema (theme) global yang konsisten, dan membutuhkan sistem navigasi yang rapi. Selain itu, `MaterialApp` juga menjadi titik awal suatu aplikasi.
+Widget `MaterialApp` menjadi widget root karena hampir semua aplikasi Flutter menggunakan design dari komponen Material Design, membutuhkan tema (theme) global yang konsisten, dan membutuhkan sistem navigasi yang rapi. Selain itu, `MaterialApp` juga menjadi titik awal suatu aplikasi.
 
 ### Jelaskan perbedaan antara StatelessWidget dan StatefulWidget. Kapan kamu memilih salah satunya?
 `StatelessWidget` adalah widget yang tidak memiliki state (keadaan) yang berubah setelah dibuat sehingga ketika sudah di-build, tampilannya akan selalu sama (statis). Sedangkan, `StatefulWidget` adalah widget yang memiliki state (keadaan) yang dapat berubah selama aplikasi berjalan, dan ketika state berubah, UI akan di-rebuild secara otomatis.
