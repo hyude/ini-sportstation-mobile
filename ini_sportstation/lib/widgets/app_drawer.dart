@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:ini_sportstation/menu.dart';
-import 'package:ini_sportstation/create_product_page.dart';
+import 'package:ini_sportstation/screens/menu.dart';
+import 'package:ini_sportstation/screens/productlist_form.dart';
+import 'package:ini_sportstation/screens/product_entry_list.dart';
 
 class AppDrawer extends StatelessWidget {
   const AppDrawer({super.key});
@@ -46,6 +47,22 @@ class AppDrawer extends StatelessWidget {
                 context,
                 MaterialPageRoute(
                   builder: (context) => const CreateProductPage(),
+                ),
+              );
+            },
+          ),
+
+          // All Products
+          ListTile(
+            leading: const Icon(Icons.shopping_cart),
+            title: const Text('All Products'),
+            onTap: () {
+              // Route to news list page
+              Navigator.pop(context);
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const ProductEntryListPage(),
                 ),
               );
             },

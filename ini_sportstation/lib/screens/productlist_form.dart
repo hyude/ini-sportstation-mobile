@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:ini_sportstation/menu.dart';
-import 'package:ini_sportstation/app_drawer.dart';
+import 'package:ini_sportstation/screens/menu.dart';
+import 'package:ini_sportstation/widgets/app_drawer.dart';
+import 'dart:convert';
+import 'package:provider/provider.dart';
+import 'package:pbp_django_auth/pbp_django_auth.dart';
 
 class CreateProductPage extends StatefulWidget {
   const CreateProductPage({super.key});
@@ -28,7 +31,7 @@ class _CreateProductPageState extends State<CreateProductPage> {
     {'value': 'raket', 'label': 'Raket'},
   ];
 
-  void _saveForm() {
+  Future<void> _saveForm(CookieRequest request) async {
     if (_formKey.currentState!.validate()) {
       showDialog(
         context: context,
@@ -48,13 +51,40 @@ class _CreateProductPageState extends State<CreateProductPage> {
           ),
           actions: [
             TextButton(
-              onPressed: () {
-                Navigator.of(context).pop(); // Tutup popup
-                Navigator.pushAndRemoveUntil(
-                  context,
-                  MaterialPageRoute(builder: (context) => MyHomePage()),
-                  (route) => false,
-                ); // Arahkan ke halaman utama
+              onPressed: () async {
+                final response = await request.postJson(
+                  "http://localhost:8000/create-flutter/",
+                  jsonEncode({
+                    "name": _nameController.text,
+                    "price": int.parse(_priceController.text),
+                    "description": _descriptionController.text,
+                    "thumbnail": _thumbnailController.text.isEmpty
+                        ? null
+                        : _thumbnailController.text,
+                    "category": _selectedCategory,
+                    "is_featured": _isFeatured,
+                  }),
+                );
+
+                if (!context.mounted) return;
+
+                if (response['status'] == 'success') {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text("Product successfully saved!"),
+                    ),
+                  );
+                  Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(builder: (context) => MyHomePage()),
+                  );
+                } else {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text("Something went wrong, please try again."),
+                    ),
+                  );
+                }
               },
               child: const Text('Tutup'),
             ),
@@ -66,6 +96,8 @@ class _CreateProductPageState extends State<CreateProductPage> {
 
   @override
   Widget build(BuildContext context) {
+    final request = context.watch<CookieRequest>();
+
     return Scaffold(
       appBar: AppBar(
         title: const Text(
@@ -95,6 +127,7 @@ class _CreateProductPageState extends State<CreateProductPage> {
                 },
               ),
               const SizedBox(height: 16.0),
+
               TextFormField(
                 controller: _priceController,
                 decoration: const InputDecoration(
@@ -112,7 +145,9 @@ class _CreateProductPageState extends State<CreateProductPage> {
                   return null;
                 },
               ),
+
               const SizedBox(height: 16.0),
+
               TextFormField(
                 controller: _descriptionController,
                 decoration: const InputDecoration(
@@ -127,7 +162,9 @@ class _CreateProductPageState extends State<CreateProductPage> {
                   return null;
                 },
               ),
+
               const SizedBox(height: 16.0),
+
               TextFormField(
                 controller: _thumbnailController,
                 decoration: const InputDecoration(
@@ -136,24 +173,22 @@ class _CreateProductPageState extends State<CreateProductPage> {
                 ),
                 keyboardType: TextInputType.url,
                 validator: (value) {
-                  // Boleh kosong karena opsional
                   if (value == null || value.isEmpty) {
                     return null;
                   }
 
-                  // Cek apakah string bisa diparsing menjadi URL dan memiliki skema http/https
                   final uri = Uri.tryParse(value);
                   if (uri == null ||
-                      (!uri.isAbsolute) ||
+                      !uri.isAbsolute ||
                       !(uri.scheme == 'http' || uri.scheme == 'https')) {
-                    return 'Masukkan URL yang valid (harus diawali dengan http atau https)';
+                    return 'Masukkan URL yang valid (http/https)';
                   }
-
-                  // Valid
                   return null;
                 },
               ),
+
               const SizedBox(height: 16.0),
+
               DropdownButtonFormField<String>(
                 initialValue: _selectedCategory,
                 decoration: const InputDecoration(
@@ -174,7 +209,9 @@ class _CreateProductPageState extends State<CreateProductPage> {
                   });
                 },
               ),
+
               const SizedBox(height: 16.0),
+
               CheckboxListTile(
                 title: const Text('Featured Product'),
                 value: _isFeatured,
@@ -184,9 +221,11 @@ class _CreateProductPageState extends State<CreateProductPage> {
                   });
                 },
               ),
+
               const SizedBox(height: 20.0),
+
               ElevatedButton(
-                onPressed: _saveForm,
+                onPressed: () => _saveForm(request),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Theme.of(context).colorScheme.primary,
                   foregroundColor: Colors.white,

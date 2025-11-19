@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:ini_sportstation/create_product_page.dart';
-import 'package:ini_sportstation/app_drawer.dart';
+import 'package:ini_sportstation/screens/login.dart';
+import 'package:ini_sportstation/screens/productlist_form.dart';
+import 'package:ini_sportstation/widgets/app_drawer.dart';
+import 'package:ini_sportstation/screens/product_entry_list.dart';
+import 'package:provider/provider.dart';
+import 'package:pbp_django_auth/pbp_django_auth.dart';
 
 class MyHomePage extends StatelessWidget {
   MyHomePage({super.key});
@@ -62,11 +66,54 @@ class MyHomePage extends StatelessWidget {
               },
             ),
             const SizedBox(height: 16.0),
-            const Padding(
-              padding: EdgeInsets.only(top: 16.0),
-              child: Text(
-                'Selamat datang di Ini Sportstation',
-                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18.0),
+            Padding(
+              padding: EdgeInsets.only(top: 16.0, left: 20.0, right: 20.0),
+              child: Row(
+                children: [
+                  Text(
+                    'Selamat datang di Ini Sportstation',
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 18.0,
+                    ),
+                  ),
+                  Spacer(),
+                  ElevatedButton(
+                    style: ButtonStyle(
+                      backgroundColor: WidgetStatePropertyAll(Colors.red),
+                      foregroundColor: WidgetStatePropertyAll(Colors.white),
+                    ),
+                    onPressed: () async {
+                      final request = context.read<CookieRequest>();
+                      final response = await request.logout(
+                        "http://localhost:8000/auth/logout/",
+                      );
+
+                      String message = response["message"];
+                      if (context.mounted) {
+                        if (response['status']) {
+                          String uname = response["username"];
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text("$message See you again, $uname."),
+                            ),
+                          );
+                          Navigator.pushReplacement(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => const LoginPage(),
+                            ),
+                          );
+                        } else {
+                          ScaffoldMessenger.of(
+                            context,
+                          ).showSnackBar(SnackBar(content: Text(message)));
+                        }
+                      }
+                    },
+                    child: Text("Logout"),
+                  ),
+                ],
               ),
             ),
 
@@ -119,12 +166,26 @@ class ItemCard extends StatelessWidget {
       color: backgroundColor,
       borderRadius: BorderRadius.circular(12),
       child: InkWell(
-        onTap: () {
+        onTap: () async {
           if (item.name == "Create Product") {
-            Navigator.push(
+            Navigator.pushReplacement(
               context,
               MaterialPageRoute(
                 builder: (context) => const CreateProductPage(),
+              ),
+            );
+          } else if (item.name == "All Products") {
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(
+                builder: (context) => const ProductEntryListPage(),
+              ),
+            );
+          } else if (item.name == "My Products") {
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(
+                builder: (context) => const ProductEntryListPage(filter: "my"),
               ),
             );
           } else {
